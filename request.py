@@ -29,12 +29,12 @@ def make_request(url, request_type='GET', params={}):
     """
     if request_type == 'GET':
         url += "?"
-        for idx, param_key in enumerate(param_keys):
-            url += "{}={}&".format(param_key, param_vals[idx])
+        for param_key, param_val in params.items():
+            url += "{}={}&".format(param_key, param_val)
 
     return url_request.Request(url)
     
-def make_mult_requests(default_url, request_type='GET', params_table=[])
+def make_mult_requests(default_url, request_type='GET', params_table=[]):
     """
     make_mult_requests(default_url[, request_type='GET', paramas_table=[]]) -> list of Request object
     Make a HTTP request to url with parameters specified in params_table.
@@ -43,10 +43,8 @@ def make_mult_requests(default_url, request_type='GET', params_table=[])
     Returns a list of Request objects.
     """
     param_keys = params_table.pop(0)
-    requests = []
-    for param_vals in params_table:
-        requests.append(make_request(default_url, request_type, param_keys, param_vals))
-    return requests
+    return [make_request(default_url, request_type, dict(zip(param_keys, param_vals))) 
+            for param_vals in params_table]
 
 def get_response(request):
     """
@@ -70,9 +68,7 @@ def get_mult_response(request_list):
     Outputs error messages to stderr if HTTP error was encountered.
     """
     response_list = []
-    for request in request_list:
-        response_list.append(request_data(request))
-    return response_list
+    return [request_data(request) for request in request_list]
 
 def read_config(file_path):
     """
