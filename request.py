@@ -76,6 +76,11 @@ def read_config(file_path):
     Reads config from file_path
     Returns a dict that holds the configuration
     """
+    url='url'
+    port='port'
+    services='services'
+    service_root='service_root'
+    request_type='request_type'
     with open(file_path) as config_file:
         config_dict = eval(config_file.read())
         return config_dict
