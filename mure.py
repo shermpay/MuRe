@@ -1,12 +1,15 @@
-import sys
+import argparse
 
 import request
 import config
 
 if __name__ == '__main__':
-    config_file = sys.argv[1]
-    print("Reading config: ", config_file)
-    conf = config.read_config(config_file)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("config_file")
+    args = parser.parse_args()
+
+    print("Reading config: ", args.config_file)
+    conf = config.read_config(args.config_file)
     requesters = config.requesters(conf)
     for requester in requesters:
         request_conf = config.get_requester(conf, requester)
