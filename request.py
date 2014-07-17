@@ -18,32 +18,35 @@ def get_request_url(root_url, port=80, service_url='/'):
                                             service_url=service_url)
     return request_str
 
-def make_request(url, request_type='GET', params={}):
+def make_request(url, method='GET', params={}):
     """
-    make_request(url[, request_type='GET', params={}]]) -> Request object
+    make_request(url[, method='GET', params={}]]) -> Request object
     Make a HTTP request to url with param.keys()=params.values() as request parameters.
     Returns a Request object.
     Request object is defined in python urllib.
     To obtain the response from the Request object, use urllib.urlopen(Request).
     To read the data from the response, use response.read()
     """
-    if request_type == 'GET':
+    if method == 'GET':
         url += "?"
         for param_key, param_val in params.items():
             url += "{}={}&".format(param_key, param_val)
+        return url_request.Request(url)
+    elif method == 'POST':
+        return url_request.Request(url, params)
+        
 
-    return url_request.Request(url)
     
-def make_mult_requests(default_url, request_type='GET', params_table=[]):
+def make_mult_requests(default_url, method='GET', params_table=[]):
     """
-    make_mult_requests(default_url[, request_type='GET', paramas_table=[]]) -> list of Request object
+    make_mult_requests(default_url[, method='GET', paramas_table=[]]) -> list of Request object
     Make a HTTP request to url with parameters specified in params_table.
     params_table should have the param_keys as a tuple/list in the 0th index.
     And each individual row should map the values to the keys by column index.
     Returns a list of Request objects.
     """
     param_keys = params_table.pop(0)
-    return [make_request(default_url, request_type, dict(zip(param_keys, param_vals))) 
+    return [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
             for param_vals in params_table]
 
 def get_response(request):
@@ -76,13 +79,9 @@ def read_config(file_path):
     Reads config from file_path
     Returns a dict that holds the configuration
     """
-    url='url'
-    port='port'
-    services='services'
-    service_root='service_root'
-    request_type='request_type'
+    config_vars = ['url', 'port', 'services', 'service_root', 'method', 'params']
     with open(file_path) as config_file:
-        config_dict = eval(config_file.read())
+        config_dict = eval(config_file.read(), {v:v for v in config_vars})
         return config_dict
 
 def get_requesters(config):
@@ -114,8 +113,8 @@ if __name__ == '__main__':
                                           service_url="{}{}".format(service_root, service))
             
             requests = make_mult_requests(default_url=request_url, 
-                                          request_type=request_conf['request_type'],
-                                          params_table=request_conf['services'][service])
+                                          method=request_conf['services'][service]['method'],
+                                          params_table=request_conf['services'][service]['params'])
             print("Requests", requests)
             for request in requests:
                 response = get_response(request)
