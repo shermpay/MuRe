@@ -1,14 +1,20 @@
-# Sherman Pay Jing Hao
-# Saturday, 12. July 2014
-# Make GET and POST request to URL
+# Author: Sherman Pay Jing Hao
+# Version: 0.1; Saturday, 12. July 2014
 
 # stdlib Modules
 from sys import stderr
 import urllib.request as url_request
 import urllib.error as url_error
 
-# Mure Modules
-import config
+""" 
+Make GET and POST request to various web services.
+This module is very functional instead of imperative.
+Use this module to obtain list of multiple Request objects,
+and then execute on that list.
+
+Future implementations would use lazy sequences/generators.
+Therefore this implementation is NOT final.
+"""
 
 def get_request_url(root_url, port=80, service_url='/'):
     """

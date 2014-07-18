@@ -9,7 +9,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print("Reading config: ", args.config_file)
-    conf = config.read_config(args.config_file)
+    conf = config.read_file(args.config_file)
     requesters = config.requesters(conf)
     for requester in requesters:
         request_conf = config.get_requester(conf, requester)
