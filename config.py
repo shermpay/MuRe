@@ -27,26 +27,27 @@ class Config(object):
     """
 
     # List of Configuration keys.
-    config_keys = ['url', 'port', 'services', 'service_root', 'method', 'params'
+    config_keys = ['url', 'port', 'services', 'service_root', 'method', 'params',
                    'GET', 'POST']
 
-    def __init__(config_file):
-        setup_env(config_keys)
+    def __init__(self, config_file):
+        self.setup_env(self.config_keys)
+        self.config = self.read_file(config_file)
 
-    def setup_env(config_keys):
+    def setup_env(self, keys):
         """
         Setup the environment of configuration
         """
-        return {v: v for v in config_keys}
+        return {v: v for v in keys}
         
-    def read_file(file_path):
+    def read_file(self, file_path):
         """
         read_file(file_path) -> dict
         Reads config from file_path
         Returns a dict that holds the configuration
         """
         with open(file_path) as config_file:
-            config_dict = eval(config_file.read(), setup_config(config_vars))
+            config_dict = eval(config_file.read(), self.setup_env(self.config_keys))
             return config_dict
 
     def requesters(self):
@@ -54,11 +55,11 @@ class Config(object):
         get_requesters(config) -> set
         Returns a set of requesters
         """
-        return config.keys()
+        return self.config.keys()
 
-    def get_requester(requester):
+    def get_requester(self, requester):
         """
         request_config(config, requester) -> dict
         Returns a particular configuration for a requester given the config_dict
         """
-        return self[requester]
+        return self.config[requester]
