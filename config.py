@@ -1,6 +1,8 @@
 # Sherman Pay Jing Hao
 # Thursday, 17. July 2014
 
+from enum import Enum
+
 """
 Module for config objects
 """
@@ -25,29 +27,29 @@ class Config(object):
                   }
     }
     """
-
-    # List of Configuration keys.
-    config_keys = ['url', 'port', 'services', 'service_root', 'method', 'params',
-                   'GET', 'POST']
+    
+    # Enumeration of Configuration keys.
+    Key = Enum('Key', 'url port services service_root method params GET POST')
 
     def __init__(self, config_file):
-        self.setup_env(self.config_keys)
-        self.config = self.read_file(config_file)
+        env = self.setup_env(self.Key)
+        self.config = self.read_file(config_file, env)
 
     def setup_env(self, keys):
         """
         Setup the environment of configuration
+        This will allow usage of unquoted variable like keywords in the config.
         """
-        return {v: v for v in keys}
-        
-    def read_file(self, file_path):
+        return {key.name : key.name for key in list(keys)}
+
+    def read_file(self, file_path, env):
         """
         read_file(file_path) -> dict
         Reads config from file_path
         Returns a dict that holds the configuration
         """
         with open(file_path) as config_file:
-            config_dict = eval(config_file.read(), self.setup_env(self.config_keys))
+            config_dict = eval(config_file.read(), env)
             return config_dict
 
     def requesters(self):

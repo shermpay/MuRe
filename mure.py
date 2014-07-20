@@ -2,48 +2,84 @@ import argparse
 import sys
 import pprint
 import json
+from datetime import datetime
 
 import request
 import config
 
-def print_requests_data(requests, file=sys.stdout, verbose=False):
-    pp = pprint.PrettyPrinter(indent=1, stream=file)
-    for req in requests:
-        response = request.get_response(req)
-        pp.pprint("[{}] {}".format(req.get_method(),req.get_full_url()))
-        if (req.data is not None):
-            pp.pprint(req.data)
+VERSION = "0.8-beta"
 
-        if response is not None:
-            pp.pprint(json.loads(response.decode(encoding='UTF-8')))
-    
-    file.close()
-            
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("config_file")
-    parser.add_argument("-o", "--output", help="output contents to OUTPUT",
-                        default=sys.stdout)
-    parser.add_argument("-v", "--verbose", action="store_true", help="More verbose output. Default: Off.")
+    parser.add_argument("-o", "--output", default=sys.stdout,
+                        help="output contents to OUTPUT",)
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="More verbose output. Default: Off.")
+    parser.add_argument("-p", "--pretty", default=0, type=int,
+                         help="Pretty printing")
+    parser.add_argument("-q", "--quiet", action="store_true",
+                         help="Quiet mode. Minimal output.")
     args = parser.parse_args()
+    if not args.quiet:
+        intro()
+    execute(args.config_file, args.output, args.pretty)
+    
+def intro():
+    print("MuRe: Multiple Requesting tool {}".format(VERSION))
+    # Non-zero padded dates, with 24-hour clock
+    print("Datetime: {}.\n".format(datetime.now().strftime("%y-%m-%d %H:%M:%S")))
 
-    print("Reading config: ", args.config_file)
-    conf = config.Config(args.config_file)
+def execute(config_file, stream, pretty):
+    print("* Reading config:", config_file)
+    print()
+    conf = config.Config(config_file)
     requesters = conf.requesters()
     for requester in requesters:
         request_conf = conf.get_requester(requester)
         service_root = request_conf['service_root']
-        for service in request_conf['services']:
+        for service in request_conf['services'].items():
             request_url = request.get_request_url(request_conf['url'],
                                                   port=request_conf['port'], 
-                                                  service_url="{}{}".format(service_root, service))
+                                                  service_url="{}{}".format(service_root, service[0]))
             
             requests = request.make_mult_requests(default_url=request_url, 
-                                                  method=request_conf['services'][service]['method'],
-                                                  params_table=request_conf['services'][service]['params'])
-            print("Getting data....")
-            if (args.output is sys.stdout):
-                print_requests_data(requests)
+                                                  method=service[1]['method'],
+                                                  params_table=service[1]['params'])
+            if (stream is sys.stdout):
+                print_requests_data(requests, pretty=pretty)
             else:
-                print_requests_data(requests, open(args.output, 'a'))
+                print_requests_data(requests, stream=open(stream, 'a'), pretty=pretty)
+
+def print_requests_data(requests, stream=sys.stdout, pretty=0, verbose=False):
+    if pretty:
+        pp = pprint.PrettyPrinter(indent=pretty, stream=stream)
+    for req in requests:
+        print("[{}] {}".format(req.get_method(),req.get_full_url()), file=stream)
+        # Might log HTTP error
+        response = request.get_response(req)
+        if req.data is not None:
+            print(req.data, file=stream)
+        
+        if verbose:
+            print('URI Scheme:', req.type)
+            print('Host:', req.host)
+            if req.has_header():
+                print('Header:', req.get_header())
+
+        if response is not None:
+            data = json.loads(response.decode(encoding='UTF-8'))
+            if pretty:
+                pp.pprint(data)
+            else:
+                print(data, file=stream)
+        else:
+            print("Request failed...", file=stream)
+
+        print(file=stream)
+    
+    if stream is not sys.stdout:
+        stream.close()
+        
+if __name__ == '__main__':
+    main()

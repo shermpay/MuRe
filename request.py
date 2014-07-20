@@ -65,7 +65,7 @@ def get_response(request):
     try:
         response = url_request.urlopen(request)
     except url_error.URLError as err:
-        print("{} was caught. Reason: {}".format(err, err.reason), file=stderr)
+        print("{}: {}".format(err, request.get_full_url()), file=stderr)
     else:
         response_data = response.read()
         return response_data
