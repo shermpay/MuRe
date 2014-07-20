@@ -35,17 +35,18 @@ def execute(config_file, stream, pretty):
     print()
     conf = config.Config(config_file)
     requesters = conf.requesters()
+    key = config.Config.Key
     for requester in requesters:
         request_conf = conf.get_requester(requester)
-        service_root = request_conf['service_root']
-        for service in request_conf['services'].items():
-            request_url = request.get_request_url(request_conf['url'],
-                                                  port=request_conf['port'], 
+        service_root = request_conf[key.service_root]
+        for service in request_conf[key.services].items():
+            request_url = request.get_request_url(request_conf[key.url],
+                                                  port=request_conf[key.port], 
                                                   service_url="{}{}".format(service_root, service[0]))
             
             requests = request.make_mult_requests(default_url=request_url, 
-                                                  method=service[1]['method'],
-                                                  params_table=service[1]['params'])
+                                                  method=service[1][key.method],
+                                                  params_table=service[1][key.params])
             if (stream is sys.stdout):
                 print_requests_data(requests, pretty=pretty)
             else:

@@ -40,7 +40,7 @@ class Config(object):
         Setup the environment of configuration
         This will allow usage of unquoted variable like keywords in the config.
         """
-        return {key.name : key.name for key in list(keys)}
+        return {key.name : key for key in list(keys)}
 
     def read_file(self, file_path, env):
         """
