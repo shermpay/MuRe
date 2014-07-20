@@ -4,8 +4,8 @@ import pprint
 import json
 from datetime import datetime
 
-import request
-import config
+import mure.request as request
+import mure.config as config
 
 VERSION = "0.8-beta"
 
