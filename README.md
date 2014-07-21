@@ -8,8 +8,6 @@ With *mure.py* you can make multiple web requests to a variety of web services s
 All you have to do is edit a config file and *mure.py* will read that config file and execute all those
 requests in random order.  
 
-**Note: Request order is random for now**
-
 ## Requirements ##
 * python 3
 
@@ -65,6 +63,12 @@ The structure of the config should be familiar to python programmers, as it is j
 
 #### Parameters ####
 Parameters should be specified as the example. 
-Only the `method` parameter is optional, the default value is `'GET'` if not specified.
+
+* url: base url
+* port: integer port number
+* service_root: service group end point
+* service: specific service end point
+* params: a 2 dimensional list, with the first row as a table header representing the parameter names and subsequent rows representing the values mapped to those names
+* method: either `'GET'` or `'POST'`
 
 
