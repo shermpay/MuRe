@@ -6,7 +6,10 @@ Simple tool to allow multiple quick Web Requests given an config file that speci
 
 With *mure.py* you can make multiple web requests to a variety of web services simply.
 All you have to do is edit a config file and *mure.py* will read that config file and execute all those
-requests in random order.  
+requests in order.
+
+A good way to utilize the tool is to setup a cron job to repeatedly execute the requests over a period of time.
+If any breakdown were to occur, the cron job could send the developer an email.
 
 ## Requirements ##
 * python 3
