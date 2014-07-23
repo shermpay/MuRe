@@ -56,12 +56,16 @@ def make_mult_requests(default_url, method='GET', params_table=[]):
     return [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
             for param_vals in params_table]
 
-def get_response(request):
+def get_response(request, proxy=None):
     """
     get_response(request) -> string
     Trys to obtain data from Request object.
     Outputs error messages to stderr if HTTP error was encountered
     """
+    if (proxy is not None):
+        print('proxy: {}'.format(proxy))
+        proxy_handler = url_request.ProxyHandler({'http': 'http://54.224.82.100:80'})
+        url_request.install_opener(url_request.build_opener(proxy_handler))
     try:
         response = url_request.urlopen(request)
     except url_error.URLError as err:

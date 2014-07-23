@@ -16,14 +16,18 @@ def main():
                         help="output contents to OUTPUT",)
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="More verbose output. Default: Off.")
-    parser.add_argument("-p", "--pretty", default=0, type=int, nargs='?', const=1,
-                         help="Pretty printing")
+    parser.add_argument("-i", "--indent", default=0, type=int, nargs='?', const=1,
+                         help="Pretty printing with INDENT")
     parser.add_argument("-q", "--quiet", action="store_true",
                          help="Quiet mode. Minimal output.")
+    parser.add_argument("-p", "--proxy", help="Make requests with PROXY")
     args = parser.parse_args()
     if not args.quiet:
         intro()
-    exec_args = {'stream': args.output, 'pretty': args.pretty, 'verbose': args.verbose}
+    if args.proxy is not None:
+        protocol, addr, port = args.proxy.split(':')
+        args.proxy = {protocol: "{}:{}".format(addr, port)}
+    exec_args = {'stream': args.output, 'indent': args.indent, 'verbose': args.verbose, 'proxy': args.proxy}
     execute(args.config_file, **exec_args)
     
 def intro():
@@ -57,15 +61,18 @@ def execute(config_file, **kwargs):
 
 def print_requests_data(requests, **kwargs):
     stream = kwargs['stream']
-    pretty = kwargs['pretty']
+    pretty = kwargs['indent']
     verbose = kwargs['verbose']
+    proxy = kwargs['proxy']
 
     if pretty:
         pp = pprint.PrettyPrinter(indent=pretty, stream=stream)
     for req in requests:
         print("[{}]\t{}".format(req.get_method(),req.get_full_url()), file=stream)
+        if proxy is not None:
+            print("Proxy: {}".format(proxy))
         # Might log HTTP error
-        response = request.get_response(req)
+        response = request.get_response(req, proxy)
         if verbose:
             print('\tURI Scheme:', req.type)
             print('\tHost:', req.host)
