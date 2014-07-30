@@ -82,9 +82,11 @@ def print_requests_data(requests, **kwargs):
             print(req.data, file=stream)
 
         if response is not None:
-            data = json.loads(response.decode(encoding='UTF-8'))
+            data = json.loads(response.read().decode(encoding='UTF-8'))
             print('\nResponse')
             print('========\n')
+            if verbose:
+                print('Info:', response.info())
             if pretty:
                 pp.pprint(data)
             else:

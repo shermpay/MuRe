@@ -71,8 +71,7 @@ def get_response(request, proxy=None):
     except url_error.URLError as err:
         print("{}: {}".format(err, request.get_full_url()), file=stderr)
     else:
-        response_data = response.read()
-        return response_data
+        return response
         
 def get_mult_response(request_list):
     """
