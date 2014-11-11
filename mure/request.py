@@ -52,9 +52,9 @@ def make_mult_requests(default_url, method='GET', params_table=[]):
     And each individual row should map the values to the keys by column index.
     Returns a list of Request objects.
     """
-    param_keys = params_table.pop(0)
+    param_keys = params_table[0]
     return [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
-            for param_vals in params_table]
+            for param_vals in params_table[1:(len(params_table))]]
 
 def get_response(request, proxy=None):
     """

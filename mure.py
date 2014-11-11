@@ -1,3 +1,4 @@
+""" Main Driver for MuRe"""
 import argparse
 import sys
 import pprint
@@ -50,16 +51,21 @@ def execute(config_file, **kwargs):
                                                   port=request_conf[key.port], 
                                                   service_url=service_str)
             
-            requests = request.make_mult_requests(default_url=request_url, 
+            request_times = request_conf[config.Config.Key.times]
+            for n in range(request_times):
+                requests = request.make_mult_requests(default_url=request_url, 
                                                   method=service_conf[key.method],
                                                   params_table=service_conf[key.params])
             
-            if (kwargs['stream'] is not sys.stdout):
-                kwargs['stream'] = open(stream, 'a')
-            
-            print_requests_data(requests, **kwargs)
+                if (kwargs['stream'] is not sys.stdout):
+                    kwargs['stream'] = open(stream, 'a')
 
+                print_requests_data(requests, **kwargs)
+
+
+# Loops through Request data and outputs them
 def print_requests_data(requests, **kwargs):
+    # Kwargs for different output
     stream = kwargs['stream']
     pretty = kwargs['indent']
     verbose = kwargs['verbose']

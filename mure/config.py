@@ -1,3 +1,4 @@
+""" Configuration Parser and Evaluator"""
 # Sherman Pay Jing Hao
 # Thursday, 17. July 2014
 
@@ -29,7 +30,7 @@ class Config(object):
     """
     
     # Enumeration of Configuration keys.
-    Key = Enum('Key', 'url port services service_root method params GET POST')
+    Key = Enum('Key', 'url port services service_root method params GET POST times')
 
     def __init__(self, config_file):
         env = self.setup_env(self.Key)
