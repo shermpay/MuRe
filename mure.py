@@ -41,26 +41,25 @@ def execute(config_file, **kwargs):
     print()
     conf = config.Config(config_file)
     requesters = conf.requesters()
-    key = config.Config.Key
+    cfg = config.Config
     for requester in requesters:
         request_conf = conf.get_requester(requester)
-        service_root = request_conf[key.service_root]
-        for service_path, service_conf in request_conf[key.services].items():
+        service_root = request_conf[cfg.TargetKey.service_root]
+        for service_path, s in request_conf[cfg.TargetKey.services].items():
             service_str = "{}{}".format(service_root, service_path)
-            request_url = request.get_request_url(request_conf[key.url],
-                                                  port=request_conf[key.port], 
+            request_url = request.get_request_url(request_conf[cfg.TargetKey.url],
+                                                  port=request_conf[cfg.TargetKey.port], 
                                                   service_url=service_str)
             
-            request_times = request_conf[config.Config.Key.times]
-            for n in range(request_times):
-                requests = request.make_mult_requests(default_url=request_url, 
-                                                  method=service_conf[key.method],
-                                                  params_table=service_conf[key.params])
+            requests = request.make_mult_requests(default_url=request_url, 
+                                                  method=s[cfg.ServiceKey.method],
+                                                  params_table=s[cfg.ServiceKey.params],
+                                                  times=s[cfg.ServiceKey.times])
             
-                if (kwargs['stream'] is not sys.stdout):
-                    kwargs['stream'] = open(stream, 'a')
+            if (kwargs['stream'] is not sys.stdout):
+                kwargs['stream'] = open(stream, 'a')
 
-                print_requests_data(requests, **kwargs)
+            print_requests_data(requests, **kwargs)
 
 
 # Loops through Request data and outputs them
@@ -90,7 +89,7 @@ def print_requests_data(requests, **kwargs):
         if response is not None:
             data = response.read()
             info = response.info()
-            
+
             if (info.get_content_subtype() == 'json'):
                 data = json.loads(data.decode(encoding='UTF-8'))
             print('\nResponse')

@@ -47,7 +47,7 @@ def make_request(url, method='GET', params={}):
         return url_request.Request(url, data=bytes(query, "utf-8"),
                                    headers=hdrs, method=method)
         
-def make_mult_requests(default_url, method='get', params_table=[]):
+def make_mult_requests(default_url, method='GET', params_table=[], times=1):
     """
     make_mult_requests(default_url[, method='get', paramas_table=[]]) -> list of request object
     make a http request to url with parameters specified in params_table.
@@ -56,8 +56,13 @@ def make_mult_requests(default_url, method='get', params_table=[]):
     returns a list of request objects.
     """
     param_keys = params_table[0]
-    return [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
-            for param_vals in params_table[1:(len(params_table))]]
+    requests = [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
+              for param_vals in params_table[1:(len(params_table))]]
+    result = []
+    for r in requests:
+        for t in range(times):
+            result.append(r)
+    return result
 
 def get_response(request, proxy=None):
     """

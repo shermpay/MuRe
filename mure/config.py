@@ -30,18 +30,22 @@ class Config(object):
     """
     
     # Enumeration of Configuration keys.
-    Key = Enum('Key', 'url port services service_root method params GET POST times')
+    TargetKey = Enum('TargetKey', 'url port services service_root')
+    ServiceKey = Enum('ServiceKey', 'method params GET POST times')
+    ConfKey = Enum('ConfKey', 'targets ordering')
 
     def __init__(self, config_file):
-        env = self.setup_env(self.Key)
+        env = self.setup_env()
         self.config = self.read_file(config_file, env)
 
-    def setup_env(self, keys):
+    def setup_env(self):
         """
         Setup the environment of configuration
         This will allow usage of unquoted variable like keywords in the config.
         """
-        return {key.name : key for key in list(keys)}
+        lst = [list(k) for k in [self.TargetKey, self.ServiceKey, self.ConfKey]]
+        
+        return {key.name : key for keys in lst for key in keys}
 
     def read_file(self, file_path, env):
         """
