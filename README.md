@@ -73,5 +73,4 @@ Parameters should be specified as the example.
 * service: specific service end point
 * params: a 2 dimensional list, with the first row as a table header representing the parameter names and subsequent rows representing the values mapped to those names
 * method: either `'GET'` or `'POST'`
-
-
+* times: an integer specifying the number of times to make the request
