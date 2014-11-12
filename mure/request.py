@@ -5,6 +5,7 @@
 from sys import stderr
 import urllib.request as url_request
 import urllib.error as url_error
+import urllib.parse as url_parse
 
 """ 
 Make GET and POST request to various web services.
@@ -36,21 +37,23 @@ def make_request(url, method='GET', params={}):
     To obtain the response from the Request object, use urllib.urlopen(Request).
     To read the data from the response, use response.read()
     """
+    query = url_parse.urlencode(params)
     if method == 'GET':
-        url += "?"
-        for param_key, param_val in params.items():
-            url += "{}={}&".format(param_key, param_val)
-        return url_request.Request(url)
+        url += "?" + query
+        return url_request.Request(url, method=method)
     elif method == 'POST':
-        return url_request.Request(url, params)
+        hdrs = {"Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+                "Content-Length": len(query)}
+        return url_request.Request(url, data=bytes(query, "utf-8"),
+                                   headers=hdrs, method=method)
         
-def make_mult_requests(default_url, method='GET', params_table=[]):
+def make_mult_requests(default_url, method='get', params_table=[]):
     """
-    make_mult_requests(default_url[, method='GET', paramas_table=[]]) -> list of Request object
-    Make a HTTP request to url with parameters specified in params_table.
+    make_mult_requests(default_url[, method='get', paramas_table=[]]) -> list of request object
+    make a http request to url with parameters specified in params_table.
     params_table should have the param_keys as a tuple/list in the 0th index.
-    And each individual row should map the values to the keys by column index.
-    Returns a list of Request objects.
+    and each individual row should map the values to the keys by column index.
+    returns a list of request objects.
     """
     param_keys = params_table[0]
     return [make_request(default_url, method, dict(zip(param_keys, param_vals))) 
@@ -59,8 +62,8 @@ def make_mult_requests(default_url, method='GET', params_table=[]):
 def get_response(request, proxy=None):
     """
     get_response(request) -> string
-    Trys to obtain data from Request object.
-    Outputs error messages to stderr if HTTP error was encountered
+    trys to obtain data from request object.
+    outputs error messages to stderr if http error was encountered
     """
     if (proxy is not None):
         print('proxy: {}'.format(proxy))
